@@ -140,6 +140,14 @@ public:
 		glPopMatrix();
 		ofPopStyle();
 	}
+    
+    void drawLeft(int x, int y, int w, int h) {
+        left_fbo.draw(x, y, w, h);
+    }
+    
+    void drawRight(int x, int y, int w, int h) {
+        right_fbo.draw(x, y, w, h);
+    }
 
 	//
 
