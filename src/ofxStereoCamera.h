@@ -17,7 +17,9 @@ struct ofxStereoCameraOutputMode
 	{
 		SIDE_BY_SIDE,
         CROSS_EYED,
-//		LINE_BY_LINE,
+        #ifndef TARGET_OPENGLES
+		LINE_BY_LINE,
+        #endif
 		SUTTER,
 		ANAGLYPH
 	};
@@ -80,30 +82,32 @@ public:
 			right_fbo.draw(0 + w / 4, h/4, w / 4, h / 4);
 			left_fbo.draw(0 + w / 2, h/4, w / 4, h / 4);
 		}
-//		else if (output == ofxStereoCameraOutputMode::LINE_BY_LINE)
-//		{
-//			shader.begin();
-//			shader.setUniformTexture("left", left_fbo.getTextureReference(), 1);
-//			shader.setUniformTexture("right", right_fbo.getTextureReference(), 2);
-//
-//			glBegin(GL_TRIANGLE_STRIP);
-//
-//			glTexCoord2f(0, 0);
-//			glVertex2f(0, 0);
-//
-//			glTexCoord2f(width, 0);
-//			glVertex2f(w, 0);
-//
-//			glTexCoord2f(0, height);
-//			glVertex2f(0, h);
-//
-//			glTexCoord2f(width, height);
-//			glVertex2f(w, h);
-//
-//			glEnd();
-//
-//			shader.end();
-//		}
+        #ifndef TARGET_OPENGLES
+		else if (output == ofxStereoCameraOutputMode::LINE_BY_LINE)
+		{
+			shader.begin();
+			shader.setUniformTexture("left", left_fbo.getTextureReference(), 1);
+			shader.setUniformTexture("right", right_fbo.getTextureReference(), 2);
+
+			glBegin(GL_TRIANGLE_STRIP);
+
+			glTexCoord2f(0, 0);
+			glVertex2f(0, 0);
+
+			glTexCoord2f(width, 0);
+			glVertex2f(w, 0);
+
+			glTexCoord2f(0, height);
+			glVertex2f(0, h);
+
+			glTexCoord2f(width, height);
+			glVertex2f(w, h);
+
+			glEnd();
+
+			shader.end();
+		}
+        #endif
 		else if (output == ofxStereoCameraOutputMode::ANAGLYPH)
 		{
 			ofPushStyle();
@@ -177,18 +181,24 @@ public:
 		if (view == ofxStereoCameraViewMode::PARALLEL)
 		{
             // for ES 1.1
+            #ifdef TARGET_OPENGLES
 			glFrustumf(-zNear * (fovx_tan + eye), zNear * (fovx_tan - eye), -zNear * fovy_tan, zNear * fovy_tan, zNear, zFar);
 			glTranslatef(-eye * focus_distance, 0, 0);
-//			glFrustum(-zNear * (fovx_tan + eye), zNear * (fovx_tan - eye), -zNear * fovy_tan, zNear * fovy_tan, zNear, zFar);
-//			glTranslated(-eye * focus_distance, 0, 0);
+            #else
+			glFrustum(-zNear * (fovx_tan + eye), zNear * (fovx_tan - eye), -zNear * fovy_tan, zNear * fovy_tan, zNear, zFar);
+			glTranslated(-eye * focus_distance, 0, 0);
+            #endif
 		}
 		else if (view == ofxStereoCameraViewMode::TOE_IN)
 		{
 			glMultMatrixf(this->getProjectionMatrix().getPtr());
 			glRotatef(-rot, 0, 1, 0);
             // for ES 1.1
+            #ifdef TARGET_OPENGLES
 			glTranslatef(-eye * focus_distance, 0, 0);
-//			glTranslated(-eye * focus_distance, 0, 0);
+            #else
+			glTranslated(-eye * focus_distance, 0, 0);
+            #endif
 		}
 
 		glMatrixMode(GL_MODELVIEW);
@@ -221,18 +231,24 @@ public:
 		if (view == ofxStereoCameraViewMode::PARALLEL)
 		{
             // for ES 1.1
+            #ifdef TARGET_OPENGLES
 			glFrustumf(-zNear * (fovx_tan - eye), zNear * (fovx_tan + eye), -zNear * fovy_tan, zNear * fovy_tan, zNear, zFar);
 			glTranslatef(eye * focus_distance, 0, 0);
-//			glFrustum(-zNear * (fovx_tan - eye), zNear * (fovx_tan + eye), -zNear * fovy_tan, zNear * fovy_tan, zNear, zFar);
-//			glTranslated(eye * focus_distance, 0, 0);
+            #else
+			glFrustum(-zNear * (fovx_tan - eye), zNear * (fovx_tan + eye), -zNear * fovy_tan, zNear * fovy_tan, zNear, zFar);
+			glTranslated(eye * focus_distance, 0, 0);
+            #endif
 		}
 		else if (view == ofxStereoCameraViewMode::TOE_IN)
 		{
 			glMultMatrixf(this->getProjectionMatrix().getPtr());
 			glRotatef(rot, 0, 1, 0);
             // for ES 1.1
+            #ifdef TARGET_OPENGLES
 			glTranslatef(eye * focus_distance, 0, 0);
-//			glTranslated(eye * focus_distance, 0, 0);
+            #else
+			glTranslated(eye * focus_distance, 0, 0);
+            #endif
 		}
 
 		glMatrixMode(GL_MODELVIEW);
